@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Zenject;
 
@@ -7,6 +8,8 @@ public class PlayerClimber : MonoBehaviour
     [SerializeField] Transform topPoint;
     [SerializeField] private float hangRayDistance;
     [SerializeField] private LayerMask hangRayLayerMask;
+
+    public Action<float> OnLedgeRichedEvent;
 
     private Player _player;
     private PlayerStateMachine _stateMachine;
@@ -38,33 +41,30 @@ public class PlayerClimber : MonoBehaviour
 
         if (Physics.Raycast(bottomRay, out RaycastHit hit, hangRayDistance, hangRayLayerMask))
         {
-            Debug.Log($"Bottom ray is catch {hit.collider.name}");            
-            isOnWall = true;
-            _stateMachine.SetState<OnWallState>();
+            if (!isOnWall)
+            {
+                Debug.Log($"Bottom ray is catch {hit.collider.name}");
+                Debug.Log($"_player.isAllowedToClimb {_player.isAllowedToClimb}");
+                if (_player.isAllowedToClimb)
+                {
+                    isOnWall = true;
+                    _stateMachine.SetState<OnWallState>();
+                } 
+            }
         }
         else isOnWall = false;
 
 
-        //if (isOnWall && !(Physics.Raycast(topRay, out RaycastHit topHit, hangRayDistance * 2, hangRayLayerMask)))
-        //{
-        //    Debug.Log($"PLAYER ON THE LEDGE{this}");
-        //    isOnLedge = true;
-
-        //    float fromTopOffset = 0;
-        //    if (Physics.Raycast(thirdRayOrigin, Vector3.down, out RaycastHit topDownHit, twoRaysYDistance * 1.1f, hangRayLayerMask))
-        //    {
-        //        fromTopOffset = topDownHit.point.y - thirdRayOrigin.y;
-        //        Debug.Log($"Catch cube with fromTopOffset  {fromTopOffset}");
-        //    }
-        //    _player.StartYAdjust(fromTopOffset, hangNormal);
-
-        //    return true;
-        //}
-        //else
-        //{
-        //    isOnLedge = false;
-        //}
-
+        if (isOnWall && !(Physics.Raycast(topRay, out RaycastHit topHit, hangRayDistance * 2, hangRayLayerMask)))
+        {            
+            isOnLedge = true;
+            OnLedgeRichedEvent?.Invoke(topHit.point.y);
+            return true;
+        }
+        else
+        {
+            isOnLedge = false;
+        }
         return false;
     }
 
@@ -77,7 +77,7 @@ public class PlayerClimber : MonoBehaviour
         //}
         //thirdRayOrigin = topPoint.position + topPoint.forward * hangRayDistance * 2f;
         Debug.DrawRay(bottomPoint.position, bottomPoint.forward * hangRayDistance, Color.blue);
-        //Debug.DrawRay(topPoint.position, topPoint.forward * hangRayDistance * 2f, Color.red);
+        Debug.DrawRay(topPoint.position, topPoint.forward * hangRayDistance * 2f, Color.red);
         //Debug.DrawRay(thirdRayOrigin, Vector3.down * twoRaysYDistance * 1.1f , Color.green );
 
     }
