@@ -2214,6 +2214,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4030862216650217911, guid: 3a41a69896a2ae34887374c897afc321, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.44
+      objectReference: {fileID: 0}
     - target: {fileID: 4476160390344369512, guid: 3a41a69896a2ae34887374c897afc321, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2253,6 +2257,14 @@ PrefabInstance:
     - target: {fileID: 4476160390344369512, guid: 3a41a69896a2ae34887374c897afc321, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5169532507588045622, guid: 3a41a69896a2ae34887374c897afc321, type: 3}
+      propertyPath: wallRayDistance
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5169532507588045622, guid: 3a41a69896a2ae34887374c897afc321, type: 3}
+      propertyPath: wallRayLayerMask.m_Bits
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 8565478728040613563, guid: 3a41a69896a2ae34887374c897afc321, type: 3}
       propertyPath: m_Name

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -35,10 +36,11 @@ public class OnWallState : State
 
     private void OnLedgeRiched(float ledgeY)
     {
-        var offsetY = ledgeY;
-        var vectorOffset = _player.transform.forward;
-        vectorOffset.y += offsetY + 1f;
-        _player.transform.position += vectorOffset;
+        _player.transform.DOMove(new Vector3(
+                                    _player.transform.position.x, 
+                                    _player.transform.position.y + 1.5f, 
+                                    _player.transform.position.z) + 
+                                    _player.transform.forward, 1f);
         stateMachine.SetState<OnGroundState>();
     }
 
