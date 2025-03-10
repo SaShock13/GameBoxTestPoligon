@@ -1,4 +1,5 @@
 ﻿using System;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -16,6 +17,10 @@ public class OnGroundState : State
     private float jumpHieght = 2.5f;
     private float speed;
     private PlayerSettings playerSettings;
+    private float slideLenght = 10f ;
+    private float horizontalVelocity = 0;
+    private float dragPower = -9f;
+    private bool isSliding = false;
 
     public OnGroundState(StateMachine stateMachine, PlayerClimber climber, CharacterController controller, 
                         Player player, PlayerInput input ,PlayerSettings settings) : base(stateMachine)
@@ -35,9 +40,33 @@ public class OnGroundState : State
         input.actions["Sprint"].performed += OnSprint;
         input.actions["Sprint"].canceled += OffSprint;
         input.actions["Crouch"].performed += OnCrouchDown;
+        input.actions["Slide"].performed += OnSlideDown;
+
         _player.ProhibitClimb(1f);
         speed = playerSettings.walkSpeed;
         _player.isGravityActive = false;
+    }
+
+    private void OnSlideDown(InputAction.CallbackContext context)
+    {
+        if(speed == playerSettings.runSpeed)
+        {
+            DoSlide();
+        }
+    }
+
+    private void DoSlide()
+    {
+        GameObject model = _player.transform.GetChild(0).gameObject;
+        controller.height = playerSettings.crouchHeight;
+        var newRotation = model.transform.rotation.eulerAngles;
+        newRotation.x = -90f;
+        model.transform.rotation = Quaternion.Euler(newRotation);
+        horizontalVelocity = MathF.Sqrt(playerSettings.slideLenght * dragPower * -2);
+        isSliding = true;
+        //controller.Move(_player.transform.position + (_player.transform.forward * slideLenght), 1.5f);
+        //_player.transform.DOMove(_player.transform.position + (_player.transform.forward * slideLenght),1.5f);
+        
     }
 
     private void Move_canceled(InputAction.CallbackContext context)
@@ -114,6 +143,10 @@ public class OnGroundState : State
             controller.Move(moveValue * Time.deltaTime * speed); 
         }
         UseGravity();
+        if (isSliding)
+        {
+            UseDrag(); 
+        }
     }
 
     private void UseGravity()
@@ -124,5 +157,25 @@ public class OnGroundState : State
             verticalVelocity += gravity * Time.deltaTime;
             controller.Move(Vector3.up * verticalVelocity * Time.deltaTime);
         }    
+    }
+    private void UseDrag()
+    {
+        Debug.Log($"horizontalVelocity {horizontalVelocity}");
+        horizontalVelocity += dragPower * Time.deltaTime;
+        controller.Move(_player.transform.forward * horizontalVelocity * Time.deltaTime);
+        if (horizontalVelocity < 0)
+        {
+            isSliding = false;
+            Stand();
+        }
+    }
+
+    private void Stand()
+    {
+        GameObject model = _player.transform.GetChild(0).gameObject;
+        controller.height = playerSettings.standHeight;
+        var newRotation = model.transform.rotation.eulerAngles;
+        newRotation.x = 0f;
+        model.transform.rotation = Quaternion.Euler(newRotation);
     }
 }

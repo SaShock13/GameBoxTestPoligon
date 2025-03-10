@@ -16,3 +16,6 @@ MonoBehaviour:
   walkSpeed: 4
   runSpeed: 8
   crouchSpeed: 2
+  crouchHeight: 1
+  standHeight: 2
+  slideLenght: 10
